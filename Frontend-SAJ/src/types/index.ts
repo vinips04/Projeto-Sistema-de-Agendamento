@@ -11,10 +11,10 @@ export interface AuthRequest {
 }
 
 export interface AuthResponse {
-  token: string;
   userId: string;
   fullName: string;
   username: string;
+  role: string;
 }
 
 // User

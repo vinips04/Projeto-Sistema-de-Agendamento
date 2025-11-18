@@ -95,8 +95,19 @@ export function Clients() {
     try {
       await clientService.delete(id);
       loadClients();
-    } catch (err) {
-      setError('Erro ao excluir cliente');
+    } catch (err: unknown) {
+      if (err && typeof err === 'object' && 'response' in err) {
+        const axiosError = err as { response?: { status?: number; data?: { message?: string } } };
+        if (axiosError.response?.status === 409) {
+          setError(axiosError.response.data?.message || 'Não é possível excluir este cliente');
+        } else if (axiosError.response?.status === 404) {
+          setError('Cliente não encontrado');
+        } else {
+          setError('Erro ao excluir cliente');
+        }
+      } else {
+        setError('Erro ao excluir cliente');
+      }
       console.error(err);
     }
   };

@@ -26,8 +26,8 @@ export function Layout({ children }: LayoutProps) {
   const { logout, fullName, username } = useAuth();
   const navigate = useNavigate();
 
-  const handleLogout = () => {
-    logout();
+  const handleLogout = async () => {
+    await logout();
     navigate('/login');
   };
 

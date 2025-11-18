@@ -3,7 +3,6 @@ import type { AxiosInstance, AxiosRequestConfig } from 'axios';
 import type { ApiResponse } from '../types';
 
 const API_BASE_URL = import.meta.env.VITE_API_BASE_URL || 'http://localhost:8080/api';
-const TOKEN_KEY = 'saj_jwt_token';
 
 class ApiClient {
   private client: AxiosInstance;
@@ -14,29 +13,15 @@ class ApiClient {
       headers: {
         'Content-Type': 'application/json',
       },
+      withCredentials: true, // Permite envio de cookies HTTP-only
     });
-
-    // Request interceptor - adiciona token JWT
-    this.client.interceptors.request.use(
-      (config) => {
-        const token = localStorage.getItem(TOKEN_KEY);
-        if (token) {
-          config.headers.Authorization = `Bearer ${token}`;
-        }
-        return config;
-      },
-      (error) => {
-        return Promise.reject(error);
-      }
-    );
 
     // Response interceptor - trata erros 401
     this.client.interceptors.response.use(
       (response) => response,
       (error) => {
         if (error.response?.status === 401) {
-          // Token expirado ou inválido
-          localStorage.removeItem(TOKEN_KEY);
+          // Sessão expirada ou inválida
           window.location.href = '/login';
         }
         return Promise.reject(error);

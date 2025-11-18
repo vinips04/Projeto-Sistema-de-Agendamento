@@ -103,8 +103,19 @@ export function Processes() {
     try {
       await processService.delete(id);
       loadData();
-    } catch (err) {
-      setError('Erro ao excluir processo');
+    } catch (err: unknown) {
+      if (err && typeof err === 'object' && 'response' in err) {
+        const axiosError = err as { response?: { status?: number; data?: { message?: string } } };
+        if (axiosError.response?.status === 409) {
+          setError(axiosError.response.data?.message || 'Não é possível excluir este processo');
+        } else if (axiosError.response?.status === 404) {
+          setError('Processo não encontrado');
+        } else {
+          setError('Erro ao excluir processo');
+        }
+      } else {
+        setError('Erro ao excluir processo');
+      }
       console.error(err);
     }
   };
