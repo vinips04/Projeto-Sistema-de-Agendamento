@@ -38,17 +38,24 @@ public class AuthService {
             throw new BadCredentialsException("Usuário ou senha inválidos.");
         }
 
-        final UserDetails userDetails = userDetailsService.loadUserByUsername(authRequest.getUsername());
-        final String jwt = jwtUtil.generateToken(userDetails);
-
         User user = userRepository.findByUsername(authRequest.getUsername())
                 .orElseThrow(() -> new ResourceNotFoundException("Usuário não encontrado após autenticação."));
 
+        final UserDetails userDetails = userDetailsService.loadUserByUsername(authRequest.getUsername());
+        final String jwt = jwtUtil.generateToken(userDetails, user.getRole());
+
         return AuthResponseDTO.builder()
-                .token(jwt)
                 .userId(user.getId().toString())
                 .fullName(user.getFullName())
                 .username(user.getUsername())
+                .role(user.getRole())
                 .build();
+    }
+
+    public String generateJwt(String username) {
+        User user = userRepository.findByUsername(username)
+                .orElseThrow(() -> new ResourceNotFoundException("Usuário não encontrado."));
+        final UserDetails userDetails = userDetailsService.loadUserByUsername(username);
+        return jwtUtil.generateToken(userDetails, user.getRole());
     }
 }

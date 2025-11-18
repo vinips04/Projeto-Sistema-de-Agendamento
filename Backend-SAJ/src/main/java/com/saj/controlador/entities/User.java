@@ -29,6 +29,9 @@ public class User {
     @Column(nullable = false)
     private String fullName;
 
+    @Column(nullable = false)
+    private String role = "ADVOGADO";
+
     @OneToMany(mappedBy = "lawyer", cascade = CascadeType.ALL, orphanRemoval = true)
     private List<Appointment> appointments = new ArrayList<>();
 }

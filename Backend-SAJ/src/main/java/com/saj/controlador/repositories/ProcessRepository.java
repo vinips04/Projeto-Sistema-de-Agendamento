@@ -12,4 +12,7 @@ import java.util.UUID;
 public interface ProcessRepository extends JpaRepository<Process, UUID> {
     @Query("SELECT COUNT(p) FROM Process p WHERE p.status = :status")
     Long countByStatus(@Param("status") String status);
+
+    @Query("SELECT COUNT(p) FROM Process p WHERE p.client.id = :clientId")
+    Long countByClientId(@Param("clientId") UUID clientId);
 }

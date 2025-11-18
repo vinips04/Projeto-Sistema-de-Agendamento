@@ -2,6 +2,7 @@ package com.saj.controlador.security;
 
 import jakarta.servlet.FilterChain;
 import jakarta.servlet.ServletException;
+import jakarta.servlet.http.Cookie;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -28,13 +29,30 @@ public class JwtRequestFilter extends OncePerRequestFilter {
     protected void doFilterInternal(HttpServletRequest request, HttpServletResponse response, FilterChain chain)
             throws ServletException, IOException {
 
-        final String authorizationHeader = request.getHeader("Authorization");
-
         String username = null;
         String jwt = null;
 
-        if (authorizationHeader != null && authorizationHeader.startsWith("Bearer ")) {
-            jwt = authorizationHeader.substring(7);
+        // Primeiro tenta extrair do cookie HTTP-only
+        Cookie[] cookies = request.getCookies();
+        if (cookies != null) {
+            for (Cookie cookie : cookies) {
+                if ("jwt".equals(cookie.getName())) {
+                    jwt = cookie.getValue();
+                    break;
+                }
+            }
+        }
+
+        // Se não encontrou no cookie, tenta do header Authorization (fallback)
+        if (jwt == null) {
+            final String authorizationHeader = request.getHeader("Authorization");
+            if (authorizationHeader != null && authorizationHeader.startsWith("Bearer ")) {
+                jwt = authorizationHeader.substring(7);
+            }
+        }
+
+        // Extrai username do JWT
+        if (jwt != null) {
             try {
                 username = jwtUtil.extractUsername(jwt);
             } catch (Exception e) {

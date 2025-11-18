@@ -23,6 +23,6 @@ public class UserDetailsServiceImpl implements UserDetailsService {
                 .orElseThrow(() -> new UsernameNotFoundException("User not found with username: " + username));
 
         return new User(user.getUsername(), user.getPassword(),
-                Collections.singletonList(new SimpleGrantedAuthority("ROLE_ADVOGADO")));
+                Collections.singletonList(new SimpleGrantedAuthority("ROLE_" + user.getRole())));
     }
 }

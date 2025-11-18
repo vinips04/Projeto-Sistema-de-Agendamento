@@ -21,4 +21,6 @@ public class UserDTO {
 
     @NotBlank(message = "Full name is mandatory")
     private String fullName;
+
+    private String role;
 }

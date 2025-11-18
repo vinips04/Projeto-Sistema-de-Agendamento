@@ -3,8 +3,10 @@ package com.saj.controlador.services;
 import com.saj.controlador.dto.UserDTO;
 import com.saj.controlador.entities.User;
 import com.saj.controlador.repositories.UserRepository;
+import com.saj.controlador.repositories.AppointmentRepository;
 import com.saj.controlador.mappers.UserMapper;
 import com.saj.controlador.exceptions.ResourceNotFoundException;
+import com.saj.controlador.exceptions.DataIntegrityException;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
@@ -18,6 +20,9 @@ public class UserService {
 
     @Autowired
     private UserRepository userRepository;
+
+    @Autowired
+    private AppointmentRepository appointmentRepository;
 
     @Autowired
     private UserMapper userMapper;
@@ -59,8 +64,18 @@ public class UserService {
 
     public void deleteUser(UUID id) {
         if (!userRepository.existsById(id)) {
-            throw new ResourceNotFoundException("User not found with id: " + id);
+            throw new ResourceNotFoundException("Usuário não encontrado com id: " + id);
         }
+
+        // Verificar se existem agendamentos vinculados ao usuário (advogado)
+        Long appointmentCount = appointmentRepository.countByLawyerId(id);
+        if (appointmentCount > 0) {
+            throw new DataIntegrityException(
+                "Não é possível excluir este usuário. Existem " + appointmentCount +
+                " agendamento(s) vinculado(s) a ele. Por favor, exclua os AGENDAMENTOS primeiro."
+            );
+        }
+
         userRepository.deleteById(id);
     }
 }

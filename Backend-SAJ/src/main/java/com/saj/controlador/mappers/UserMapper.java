@@ -15,6 +15,7 @@ public class UserMapper {
         dto.setId(user.getId());
         dto.setUsername(user.getUsername());
         dto.setFullName(user.getFullName());
+        dto.setRole(user.getRole());
         return dto;
     }
 
@@ -26,6 +27,7 @@ public class UserMapper {
         user.setId(dto.getId());
         user.setUsername(dto.getUsername());
         user.setFullName(dto.getFullName());
+        user.setRole(dto.getRole() != null ? dto.getRole() : "ADVOGADO");
         // Note: Password is not mapped here. It's handled separately in the service layer for security.
         return user;
     }

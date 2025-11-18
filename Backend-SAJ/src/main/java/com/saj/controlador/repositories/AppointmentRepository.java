@@ -24,6 +24,15 @@ public interface AppointmentRepository extends JpaRepository<Appointment, UUID> 
     // Adicionado para desvincular agendamentos de um processo
     List<Appointment> findByProcess(Process process);
 
+    @Query("SELECT COUNT(a) FROM Appointment a WHERE a.lawyer.id = :lawyerId")
+    Long countByLawyerId(@Param("lawyerId") UUID lawyerId);
+
+    @Query("SELECT COUNT(a) FROM Appointment a WHERE a.client.id = :clientId")
+    Long countByClientId(@Param("clientId") UUID clientId);
+
+    @Query("SELECT COUNT(a) FROM Appointment a WHERE a.process.id = :processId")
+    Long countByProcessId(@Param("processId") UUID processId);
+
     @Query(value = "SELECT * FROM appointments a WHERE a.lawyer_id = :lawyerId AND " +
            "((a.date_time BETWEEN :start AND :end) OR " +
            "(a.date_time + (a.duration_minutes * interval '1 minute') BETWEEN :start AND :end) OR " +
